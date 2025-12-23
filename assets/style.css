@@ -1,0 +1,61 @@
+   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Clase CARD solicitada */
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* equivalente a rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            overflow: hidden;
+            max-width: 72rem; /* max-w-6xl */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Animación para el modal */
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* Estilos personalizados para notificaciones */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success { background-color: #10b981; }
+        .toast.error { background-color: #ef4444; }
