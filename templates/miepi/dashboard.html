@@ -7,77 +7,53 @@
 {% block content %}
 <!-- Aquí va SOLO el contenido específico de eventos -->
 <div class="bg-white p-6 rounded shadow">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  <style>
+* { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+label { font-size: 14px; color: #444; }
+input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px; }
+button { padding: 10px; border: none; border-radius: 10px; background: #52658c; color: #fff; font-size: 16px; cursor: pointer; }
+button:hover { background: #5b83a5; }
+button:focus { outline: none; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-        }
+/* Botón centrado */
+.submit-container { grid-column: 1 / -1; text-align: center; margin-top: 10px; }
 
-        /* Clase CARD solicitada */
-        .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            /* equivalente a rounded-xl */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            /* shadow-lg */
-            overflow: hidden;
-            max-width: 72rem;
-            /* max-w-6xl */
-            margin-left: auto;
-            margin-right: auto;
-        }
+/* Tabla */
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; }
+th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; font-size: 14px; }
+th { background: #eaeaea; }
 
-        /* Animación para el modal */
-        .modal {
-            transition: opacity 0.3s ease-in-out;
-            opacity: 0;
-            pointer-events: none;
-        }
+/* QR */
+.qr-container { margin-top: 10px; text-align: center; }
+.qr-button { background: #4aa3f0; font-size: 13px; padding: 6px 10px; margin-top: 4px; border-radius: 5px; cursor:pointer; color:#fff; border:none; }
+.qr-button:hover { background: #3780c0; }
 
-        .modal.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            transform: scale(0.95);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-
-        /* Estilos personalizados para notificaciones */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            color: white;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            z-index: 50;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .toast.success {
-            background-color: #10b981;
-        }
-
-        .toast.error {
-            background-color: #ef4444;
-        }
-    </style>
+/* Popups centrados */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: #ff6b6b;
+    color: #fff;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    font-size: 16px;
+    text-align: center;
+    max-width: 300px;
+}
+.popup.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+</style>
 
     <!-- 
       ========================================
@@ -88,381 +64,189 @@
     <!-- DIV CON CLASE CARD -->
 
         <!-- Encabezado y Controles Unificados -->
-        <div
-            class="p-6 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="container">
 
-            <!-- IZQUIERDA: Título -->
+    <section id="registro">
+        <h1>Registro de Inscritos</h1>
+        <form id="form">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Directorio</h1>
-                <p class="text-sm text-gray-500">Gestión de usuarios</p>
+                <label>Nombre completo</label>
+                <input type="text" id="nombre" required>
             </div>
-
-            <!-- DERECHA: Buscador (corto), Filtro y Botón -->
-            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-
-                <!-- Buscador más corto (w-full en movil, w-48 en escritorio) -->
-                <div class="relative w-full sm:w-48">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
-                    </div>
-                    <input type="text" id="searchInput" placeholder="Buscar..."
-                        class="pl-9 pr-4 py-2 w-full border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
-                </div>
-
-                <!-- Filtro -->
-                <select id="roleFilter"
-                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
-                    <option value="">Todos</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Editor">Editor</option>
-                    <option value="Viewer">Viewer</option>
+            <div>
+                <label>Sub zona</label>
+                <input type="text" id="subzona" required>
+            </div>
+            <div>
+                <label>Teléfono</label>
+                <input type="tel" id="telefono" required>
+            </div>
+            <div>
+                <label>Grado eclesiástico</label>
+                <input type="text" id="grado" required>
+            </div>
+            <div>
+                <label>Curso</label>
+                <input type="text" id="curso" required>
+            </div>
+            <div>
+                <label>¿Pago?</label>
+                <select id="pago" required>
+                    <option value="">Seleccione</option>
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
                 </select>
-
-                <!-- Botón Crear -->
-                <button onclick="openModal()"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm text-sm font-medium whitespace-nowrap">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    Nuevo
-                </button>
             </div>
-        </div>
-
-        <!-- Tabla -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-50 text-gray-600 uppercase text-xs leading-normal">
-                        <th class="py-3 px-6 text-left">Usuario</th>
-                        <th class="py-3 px-6 text-left">Rol</th>
-                        <th class="py-3 px-6 text-center">Estado</th>
-                        <th class="py-3 px-6 text-center">Fecha Registro</th>
-                        <th class="py-3 px-6 text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody" class="text-gray-600 text-sm font-light">
-                    <!-- Las filas se generarán con JS -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Paginación o Footer de tabla -->
-        <div class="p-4 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500">
-            <span id="showingText">Mostrando 0 registros</span>
-            <div class="flex gap-1">
-                <!-- Paginación visual simple -->
-                <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>Anterior</button>
-                <button class="px-3 py-1 border rounded bg-indigo-50 text-indigo-600 border-indigo-200">1</button>
-                <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
-                    disabled>Siguiente</button>
+            <div>
+                <label>Periodo de pago</label>
+                <select id="periodo" disabled>
+                    <option value="">Seleccione</option>
+                    <option value="Primer periodo|1500">07 Ene - 21 Feb | $1,500</option>
+                    <option value="Segundo periodo|1700">22 Feb - 31 Mar | $1,700</option>
+                    <option value="Tercer periodo|1900">31 Mar - 26 Abr | $1,900</option>
+                </select>
             </div>
-        </div>
 
-    <!-- Modal Formulario (Agregar/Editar) -->
-    <div id="userModal"
-        class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-        <div class="modal-content bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative m-4">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <h2 id="modalTitle" class="text-xl font-bold mb-1 text-gray-800">Nuevo Usuario</h2>
-            <p class="text-sm text-gray-500 mb-6">Complete la información del usuario.</p>
-
-            <form id="userForm" onsubmit="handleFormSubmit(event)">
-                <input type="hidden" id="userId">
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-                        <input type="text" id="userName" required
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                        <input type="email" id="userEmail" required
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-                            <select id="userRole"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
-                                <option value="Admin">Admin</option>
-                                <option value="Editor">Editor</option>
-                                <option value="Viewer">Viewer</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                            <select id="userStatus"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 flex gap-3 justify-end">
-                    <button type="button" onclick="closeModal()"
-                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancelar</button>
-                    <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Guardar
-                        Usuario</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmación de Eliminación -->
-    <div id="deleteModal"
-        class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-        <div class="modal-content bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 relative m-4 text-center">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600">
-                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            <div class="submit-container">
+                <button type="submit">Registrar</button>
             </div>
-            <h3 class="text-lg font-bold text-gray-900">¿Estás seguro?</h3>
-            <p class="text-gray-500 text-sm mt-2">Esta acción eliminará al usuario permanentemente y no se puede
-                deshacer.</p>
-            <div class="mt-6 flex justify-center gap-3">
-                <button onclick="closeDeleteModal()"
-                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Sí,
-                    eliminar</button>
-            </div>
-        </div>
-    </div>
+        </form>
+    </section>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">Mensaje de notificación</div>
+    <section id="inscritos">
+        <h1>Lista de Inscritos</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Sub zona</th>
+                    <th>Teléfono</th>
+                    <th>Grado</th>
+                    <th>Curso</th>
+                    <th>Pago</th>
+                    <th>Periodo</th>
+                    <th>Monto</th>
+                    <th>QR</th>
+                </tr>
+            </thead>
+            <tbody id="tabla"></tbody>
+        </table>
+    </section>
+</div>
+
+<div id="popup" class="popup"></div>
 
     <!-- 
       ========================================
       LÓGICA JAVASCRIPT (Para tu archivo app.js)
       ========================================
     -->
-    <script>
-        // --- ESTADO INICIAL (Datos Mock) ---
-        let users = [
-            { id: 1, name: "Ana Martínez", email: "ana.martinez@ejemplo.com", role: "Admin", status: "Activo", date: "2023-10-15" },
-            { id: 2, name: "Carlos López", email: "carlos.lopez@ejemplo.com", role: "Editor", status: "Inactivo", date: "2023-11-02" },
-            { id: 3, name: "Maria García", email: "maria.garcia@ejemplo.com", role: "Viewer", status: "Activo", date: "2023-12-10" },
-            { id: 4, name: "Juan Perez", email: "juan.perez@ejemplo.com", role: "Viewer", status: "Activo", date: "2024-01-05" },
-            { id: 5, name: "Sofía Ruiz", email: "sofia.ruiz@ejemplo.com", role: "Editor", status: "Activo", date: "2024-01-20" }
-        ];
+   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<script>
+const form = document.getElementById('form');
+const tabla = document.getElementById('tabla');
+const popup = document.getElementById('popup');
+const inscritos = [];
 
-        let deleteId = null; // Para almacenar ID temporalmente al eliminar
+const pagoSelect = document.getElementById('pago');
+const periodoSelect = document.getElementById('periodo');
 
-        // --- REFERENCIAS DOM ---
-        const tableBody = document.getElementById('userTableBody');
-        const searchInput = document.getElementById('searchInput');
-        const roleFilter = document.getElementById('roleFilter');
-        const userModal = document.getElementById('userModal');
-        const deleteModal = document.getElementById('deleteModal');
-        const userForm = document.getElementById('userForm');
-        const modalTitle = document.getElementById('modalTitle');
-        const showingText = document.getElementById('showingText');
+// Habilitar/deshabilitar periodo según pago
+pagoSelect.addEventListener('change', () => {
+    if(pagoSelect.value === 'Sí'){
+        periodoSelect.disabled = false;
+    } else {
+        periodoSelect.value = '';
+        periodoSelect.disabled = true;
+    }
+});
 
-        // --- INICIALIZACIÓN ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTable();
-            lucide.createIcons(); // Inicializar iconos
+function showPopup(msg, color="#ff6b6b"){
+    popup.textContent = msg;
+    popup.style.background = color;
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 1000);
+}
+
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const nombre = document.getElementById('nombre').value.trim();
+    const subzona = document.getElementById('subzona').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const grado = document.getElementById('grado').value.trim();
+    const curso = document.getElementById('curso').value.trim();
+    const pago = pagoSelect.value;
+    const periodoMonto = periodoSelect.value;
+
+    // Validación campos
+    if(!nombre || !subzona || !telefono || !grado || !curso || !pago || (pago==='Sí' && !periodoMonto)){
+        showPopup("Todos los campos obligatorios deben llenarse");
+        return;
+    }
+
+   // Validación duplicado
+if(inscritos.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase() && p.telefono===telefono)){
+    showPopup("Esta persona ya está registrada");
+    form.reset();       // <-- Limpia todos los campos
+    periodoSelect.disabled = true; // <-- Desactiva periodo
+    return;
+}
+
+
+    inscritos.push({nombre, telefono});
+
+    let periodo = '';
+    let monto = '';
+    if(pago === 'Sí'){
+        [periodo, monto] = periodoMonto.split('|');
+    } else {
+        periodo = 'No pagó';
+        monto = '-';
+    }
+
+    // Insertar fila
+    const fila = document.createElement('tr');
+    const qrCell = document.createElement('td');
+    const qrDiv = document.createElement('div');
+    qrDiv.classList.add('qr-container');
+
+    const qrButton = document.createElement('button');
+    qrButton.classList.add('qr-button');
+    qrButton.textContent = 'Ver QR';
+    qrButton.onclick = () => {
+        qrDiv.innerHTML = '';
+        const qr = new QRCode(qrDiv, {
+            text: `Nombre: ${nombre}\nSub zona: ${subzona}\nTel: ${telefono}\nGrado: ${grado}\nCurso: ${curso}\nPago: ${pago}\nPeriodo: ${periodo}\nMonto: ${monto}`,
+            width: 100,
+            height: 100
         });
-
-        // --- FUNCIONES DE RENDERIZADO ---
-        function renderTable() {
-            tableBody.innerHTML = '';
-
-            // Filtros
-            const searchTerm = searchInput.value.toLowerCase();
-            const roleTerm = roleFilter.value;
-
-            const filteredUsers = users.filter(user => {
-                const matchesSearch = user.name.toLowerCase().includes(searchTerm) ||
-                    user.email.toLowerCase().includes(searchTerm);
-                const matchesRole = roleTerm === '' || user.role === roleTerm;
-                return matchesSearch && matchesRole;
-            });
-
-            // Actualizar contador
-            showingText.innerText = `Mostrando ${filteredUsers.length} registros`;
-
-            if (filteredUsers.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-8 text-center text-gray-400">
-                            <div class="flex flex-col items-center justify-center">
-                                <i data-lucide="search-x" class="w-12 h-12 mb-2 opacity-50"></i>
-                                <p>No se encontraron resultados</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                lucide.createIcons();
-                return;
+        setTimeout(() => {
+            const qrImg = qrDiv.querySelector('img');
+            if(qrImg){
+                const link = document.createElement('a');
+                link.href = qrImg.src;
+                link.download = `${nombre}.png`;
+                link.textContent = 'Descargar QR';
+                qrDiv.appendChild(document.createElement('br'));
+                qrDiv.appendChild(link);
             }
+        }, 100);
+    };
 
-            filteredUsers.forEach(user => {
-                const row = document.createElement('tr');
-                row.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors";
+    qrDiv.appendChild(qrButton);
+    qrCell.appendChild(qrDiv);
 
-                // Estilos de estado
-                const statusClass = user.status === 'Activo'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700';
+    fila.innerHTML = `<td>${nombre}</td><td>${subzona}</td><td>${telefono}</td><td>${grado}</td><td>${curso}</td><td>${pago}</td><td>${periodo}</td><td>${monto}</td>`;
+    fila.appendChild(qrCell);
+    tabla.appendChild(fila);
 
-                // Avatar con iniciales
-                const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                const avatarColor = stringToColor(user.name);
+    form.reset();
+    periodoSelect.disabled = true; // reset
+    showPopup("Inscripción realizada con éxito!", "#4aa3f0");
+});
+</script>
 
-                row.innerHTML = `
-                    <td class="py-3 px-6 text-left whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white mr-3" style="background-color: ${avatarColor}">
-                                ${initials}
-                            </div>
-                            <div>
-                                <div class="font-medium text-gray-800">${user.name}</div>
-                                <div class="text-xs text-gray-400">${user.email}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="py-3 px-6 text-left">
-                        <span class="bg-gray-100 text-gray-600 py-1 px-3 rounded-full text-xs font-semibold border border-gray-200">${user.role}</span>
-                    </td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="${statusClass} py-1 px-3 rounded-full text-xs font-semibold opacity-90">${user.status}</span>
-                    </td>
-                    <td class="py-3 px-6 text-center text-xs text-gray-500">
-                        ${user.date}
-                    </td>
-                    <td class="py-3 px-6 text-center">
-                        <div class="flex item-center justify-center gap-2">
-                            <button onclick="editUser(${user.id})" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors" title="Editar">
-                                <i data-lucide="pencil" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="askDeleteUser(${user.id})" class="w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors" title="Eliminar">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-            lucide.createIcons();
-        }
-
-        // --- EVENT LISTENERS PARA FILTROS ---
-        searchInput.addEventListener('input', renderTable);
-        roleFilter.addEventListener('change', renderTable);
-
-        // --- LÓGICA DEL MODAL (AGREGAR/EDITAR) ---
-        function openModal(isEdit = false) {
-            userModal.classList.add('active');
-            if (!isEdit) {
-                userForm.reset();
-                document.getElementById('userId').value = '';
-                modalTitle.innerText = "Nuevo Usuario";
-            }
-        }
-
-        function closeModal() {
-            userModal.classList.remove('active');
-        }
-
-        // --- LÓGICA DE ELIMINACIÓN ---
-        function askDeleteUser(id) {
-            deleteId = id;
-            deleteModal.classList.add('active');
-
-            // Configurar el botón de confirmación
-            document.getElementById('confirmDeleteBtn').onclick = function () {
-                users = users.filter(u => u.id !== deleteId);
-                renderTable();
-                closeDeleteModal();
-                showToast("Usuario eliminado correctamente", "success");
-            };
-        }
-
-        function closeDeleteModal() {
-            deleteModal.classList.remove('active');
-            deleteId = null;
-        }
-
-        // --- LOGICA CRUD (CREATE / UPDATE) ---
-        function handleFormSubmit(e) {
-            e.preventDefault();
-
-            const id = document.getElementById('userId').value;
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            const role = document.getElementById('userRole').value;
-            const status = document.getElementById('userStatus').value;
-
-            if (id) {
-                // Editar existente
-                const index = users.findIndex(u => u.id == id);
-                if (index !== -1) {
-                    users[index] = { ...users[index], name, email, role, status };
-                    showToast("Usuario actualizado con éxito", "success");
-                }
-            } else {
-                // Crear nuevo
-                const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-                const date = new Date().toISOString().split('T')[0];
-                users.push({ id: newId, name, email, role, status, date });
-                showToast("Usuario creado con éxito", "success");
-            }
-
-            closeModal();
-            renderTable();
-        }
-
-        function editUser(id) {
-            const user = users.find(u => u.id === id);
-            if (user) {
-                document.getElementById('userId').value = user.id;
-                document.getElementById('userName').value = user.name;
-                document.getElementById('userEmail').value = user.email;
-                document.getElementById('userRole').value = user.role;
-                document.getElementById('userStatus').value = user.status;
-
-                modalTitle.innerText = "Editar Usuario";
-                openModal(true);
-            }
-        }
-
-        // --- UTILIDADES ---
-
-        // Generar color aleatorio consistente basado en texto (para avatares)
-        function stringToColor(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-            return '#' + "00000".substring(0, 6 - c.length) + c;
-        }
-
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.className = `toast show ${type}`;
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // Cerrar modal si se hace clic afuera
-        window.onclick = function (event) {
-            if (event.target == userModal) closeModal();
-            if (event.target == deleteModal) closeDeleteModal();
-        }
-    </script>
-</div>
 {% endblock %}
 
 Al hacer esto, la página de eventos heredará automáticamente el Sidebar, el Navbar y el Footer que acabo de crear.
