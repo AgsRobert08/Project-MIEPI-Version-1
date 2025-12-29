@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>{% block title %}Panel de Administración{% endblock %}</title>
+<title>{% block title %}Pase de Lista{% endblock %}</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -36,6 +36,7 @@ overflow:hidden;
 }
 .wrapper{display:flex;height:100vh}
 
+/* Sidebar */
 #sidebar{
 width:260px;
 background:var(--bg-glass);
@@ -45,7 +46,7 @@ display:flex;
 flex-direction:column;
 }
 .logo{
-height:64px;
+height:80px;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -53,8 +54,19 @@ gap:10px;
 font-size:22px;
 font-weight:700;
 border-bottom:1px solid var(--border-main);
+flex-wrap:wrap;
+text-align:center;
 }
-.logo img{height:32px}
+.logo img{
+height:32px;
+object-fit:contain;
+}
+.logo span{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:6px;
+}
 nav{flex:1;padding:16px}
 nav p{
 font-size:11px;
@@ -169,7 +181,12 @@ button{background:none;border:none;font-size:18px;cursor:pointer}
 
 <aside id="sidebar">
 <div class="logo">
-<img src="/assets/EEBV.png" alt="EBV"> EBV
+<span>
+    <img src="https://www.miepi.com/images/1miepi/LogoMIEPI.png" alt="Otro Logo">
+</span>
+EBV
+<img src="https://www.miepi.com/images/4ebv/logoEBV.png" alt="EBV">
+
 </div>
 
 <nav>
