@@ -1,259 +1,269 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Panel de Administración{% endblock %}</title>
-    
-    <!-- Tailwind CSS (Estilos) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome (Iconos) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Fuentes de Google -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Transiciones suaves para el sidebar */
-        .sidebar-transition { transition: all 0.3s ease-in-out; }
-    </style>
+<title>{% block title %}Panel de Administración{% endblock %}</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg-main:linear-gradient(135deg,#c7d2fe,#fbcfe8);
+--bg-glass:rgba(255,255,255,.75);
+--bg-card:rgba(255,255,255,.82);
+--text-main:#334155;
+--text-muted:#64748b;
+--border-main:rgba(203,213,245,.8);
+}
+.dark{
+--bg-main:linear-gradient(135deg,#020617,#1e293b);
+--bg-glass:rgba(2,6,23,.75);
+--bg-card:rgba(2,6,23,.8);
+--text-main:#e5e7eb;
+--text-muted:#94a3b8;
+--border-main:rgba(51,65,85,.8);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+font-family:Inter,sans-serif;
+background:var(--bg-main);
+color:var(--text-main);
+height:100vh;
+overflow:hidden;
+}
+.wrapper{display:flex;height:100vh}
+
+#sidebar{
+width:260px;
+background:var(--bg-glass);
+backdrop-filter:blur(16px);
+border-right:1px solid var(--border-main);
+display:flex;
+flex-direction:column;
+}
+.logo{
+height:64px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+font-size:22px;
+font-weight:700;
+border-bottom:1px solid var(--border-main);
+}
+.logo img{height:32px}
+nav{flex:1;padding:16px}
+nav p{
+font-size:11px;
+text-transform:uppercase;
+color:var(--text-muted);
+margin:16px 0 8px;
+}
+nav a{
+display:flex;
+align-items:center;
+gap:10px;
+padding:12px;
+color:var(--text-muted);
+text-decoration:none;
+border-radius:10px;
+}
+nav a:hover{
+background:rgba(0,0,0,.08);
+color:var(--text-main)
+}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+header{
+height:64px;
+background:var(--bg-glass);
+backdrop-filter:blur(16px);
+border-bottom:1px solid var(--border-main);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 20px;
+}
+.profile{display:flex;align-items:center;gap:12px}
+.avatar{
+width:40px;height:40px;border-radius:50%;
+background:linear-gradient(135deg,#c7d2fe,#fbcfe8);
+display:flex;align-items:center;justify-content:center;font-weight:700;
+}
+
+main{flex:1;padding:24px;overflow-y:auto}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:24px;
+}
+.card{
+background:var(--bg-card);
+backdrop-filter:blur(16px);
+border:1px solid var(--border-main);
+border-radius:16px;
+padding:20px;
+}
+.card h4{
+font-size:12px;
+text-transform:uppercase;
+color:var(--text-muted);
+}
+.card p{
+font-size:28px;
+font-weight:700;
+margin-top:8px;
+}
+
+.table-box{
+background:var(--bg-card);
+backdrop-filter:blur(18px);
+border:1px solid var(--border-main);
+border-radius:18px;
+overflow:hidden;
+}
+table{
+width:100%;
+border-collapse:separate;
+border-spacing:0;
+}
+th,td{
+padding:14px;
+font-size:14px;
+border-bottom:1px solid var(--border-main);
+border-right:1px solid var(--border-main);
+text-align:center;
+}
+th:last-child,td:last-child{border-right:none}
+thead{background:rgba(0,0,0,.04)}
+
+.badge{
+padding:6px 14px;
+border-radius:999px;
+font-size:12px;
+font-weight:600;
+}
+.present{background:rgba(34,197,94,.2);color:#16a34a}
+.late{background:rgba(234,179,8,.2);color:#ca8a04}
+.absent{background:rgba(239,68,68,.2);color:#dc2626}
+
+footer{
+padding:12px;
+text-align:center;
+font-size:12px;
+border-top:1px solid var(--border-main);
+background:var(--bg-glass);
+}
+button{background:none;border:none;font-size:18px;cursor:pointer}
+</style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased">
 
-    <div class="flex h-screen overflow-hidden">
+<body>
+<div class="wrapper">
 
-        <!-- SIDEBAR (Barra Lateral) -->
-        <!-- En móvil está oculto por defecto, en desktop (md) siempre visible -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 flex flex-col shadow-xl">
-            
-            <!-- Logo / Brand -->
-            <div class="flex items-center justify-center h-16 border-b border-slate-700 bg-slate-800">
-                <span class="text-2xl font-bold text-blue-400">
-                    <i class="fa-solid fa-cube"></i> MIEPI
-                </span>
-            </div>
+<aside id="sidebar">
+<div class="logo">
+<img src="/assets/EEBV.png" alt="EBV"> EBV
+</div>
 
-            <!-- Navegación -->
-            <nav class="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
-                
-                <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                    Principal
-                </p>
+<nav>
+<p>Principal</p>
+<a href="#"><i class="fa-solid fa-gauge"></i>Registro</a>
 
-                <!-- Link Dashboard General -->
-                <a href="#" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors group">
-                    <i class="fa-solid fa-gauge w-6 text-center mr-2 text-slate-400 group-hover:text-blue-400"></i>
-                    Dashboard
-                </a>
+<p>Módulos</p>
+<a href="#"><i class="fa-solid fa-file-signature"></i>Lista de Inscritos</a>
+<a href="#"><i class="fa-solid fa-clipboard-user"></i>Pase de lista</a>
+</nav>
 
-                <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mt-6 mb-2">
-                    Módulos
-                </p>
+<div style="padding:16px;border-top:1px solid var(--border-main)">
+<a href="#" style="display:flex;gap:10px;align-items:center;color:var(--text-muted);text-decoration:none">
+<i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+</a>
+</div>
+</aside>
 
-                <!-- MÓDULO: USUARIOS -->
-                <a href="#" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors group">
-                    <i class="fa-solid fa-users w-6 text-center mr-2 text-slate-400 group-hover:text-green-400"></i>
-                    Usuarios
-                </a>
+<div class="main">
 
-                <!-- MÓDULO: EVENTOS -->
-                <a href="#" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors group">
-                    <i class="fa-regular fa-calendar-check w-6 text-center mr-2 text-slate-400 group-hover:text-yellow-400"></i>
-                    Eventos
-                </a>
-                    
-                <!-- MÓDULO: INSCRIPCIONES -->
-                <a href="#" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors group">
-                    <i class="fa-solid fa-file-signature w-6 text-center mr-2 text-slate-400 group-hover:text-purple-400"></i>
-                    Inscripciones
-                </a>
+<header>
+<h2>{% block header_title %}Pase de Lista{% endblock %}</h2>
+<div class="profile">
+<div class="avatar">A</div>
+<button onclick="toggleTheme()">
+<i id="themeIcon" class="fa-solid fa-moon"></i>
+</button>
+</div>
+</header>
 
-                <!-- MÓDULO: PASE DE LISTA -->
-                <a href="#" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors group">
-                    <i class="fa-solid fa-clipboard-user w-6 text-center mr-2 text-slate-400 group-hover:text-red-400"></i>
-                    Pase de Lista
-                </a>
+<main>
+{% block content %}
 
-            </nav>
+<div class="cards">
+<div class="card"><h4>Total Usuarios</h4><p id="totalUsuarios">0</p></div>
+<div class="card"><h4>Inscripciones Hoy</h4><p id="inscripciones">0</p></div>
+<div class="card"><h4>Asistencia</h4><p id="asistencia">0%</p></div>
+</div>
 
-            <!-- Footer del Sidebar (Cerrar Sesión) -->
-            <div class="border-t border-slate-700 p-4">
-                <a href="#" class="flex items-center w-full px-4 py-2 text-sm text-slate-300 hover:bg-red-600 hover:text-white rounded-lg transition-colors">
-                    <i class="fa-solid fa-right-from-bracket mr-3"></i>
-                    Cerrar Sesión
-                </a>
-            </div>
-        </aside>
+<div class="card" style="margin-bottom:24px;text-align:center">
+<h4>Escanear QR</h4>
+<div style="margin-top:14px;height:280px;max-width:360px;margin-inline:auto;border:2px dashed var(--border-main);border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.04)">
+<span style="color:var(--text-muted)">Cámara QR aquí</span>
+</div>
+<p style="font-size:12px;color:var(--text-muted);margin-top:10px">
+Coloca el código QR frente a la cámara para registrar asistencia
+</p>
+</div>
 
-        <!-- CONTENIDO PRINCIPAL Y HEADER -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-100 relative">
+<div class="card" style="margin-bottom:20px">
+<h4>Buscar asistente</h4>
+<input type="text" placeholder="Buscar por nombre o teléfono..."
+style="width:100%;padding:14px;border-radius:12px;border:1px solid var(--border-main);background:transparent;color:var(--text-main);margin-top:12px;font-size:14px">
+</div>
 
-            <!-- NAVBAR (Header Superior) -->
-            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
-                
-                <!-- Botón Toggle Sidebar (Móvil) -->
-                <button id="sidebarToggle" class="text-gray-500 hover:text-gray-700 focus:outline-none md:hidden">
-                    <i class="fa-solid fa-bars text-2xl"></i>
-                </button>
+<div class="table-box">
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Nombre Completo</th>
+<th>Teléfono</th>
+<th>Día</th>
+<th>Estado</th>
+<th>Hora de entrada</th>
+</tr>
+</thead>
+<tbody id="tabla"></tbody>
+</table>
+</div>
 
-                <!-- Título dinámico (opcional) -->
-                <h2 class="text-xl font-semibold text-gray-800 hidden md:block">
-                    {% block header_title %}Bienvenido{% endblock %}
-                </h2>
+{% endblock %}
+</main>
 
-                <!-- Perfil de Usuario -->
-                <div class="flex items-center space-x-4">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-sm font-semibold text-gray-800">Administrador</p>
-                        <p class="text-xs text-gray-500">admin@proyecto.com</p>
-                    </div>
-                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold cursor-pointer">
-                        A
-                    </div>
-                </div>
-            </header>
+<footer>© 2025 Sistema de Gestión</footer>
 
-            <!-- ÁREA DE CONTENIDO PRINCIPAL -->
-            <!-- Aquí es donde se inyectará el contenido de tus otras páginas HTML -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 scroll-smooth">
-                
-                {% block content %}
-                <!-- ======================================================= -->
-                <!-- ESTO ES SOLO UN EJEMPLO DE VISUALIZACIÓN PARA EL DASHBOARD -->
-                <!-- Cuando heredes este archivo, esto se sobrescribirá -->
-                <!-- ======================================================= -->
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <!-- Tarjeta Usuarios -->
-                    <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-sm text-gray-500 uppercase font-bold">Total Usuarios</p>
-                                <p class="text-2xl font-bold text-gray-800">1,240</p>
-                            </div>
-                            <div class="text-green-500 bg-green-100 p-3 rounded-full">
-                                <i class="fa-solid fa-users fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
+</div>
+</div>
 
-                    <!-- Tarjeta Eventos -->
-                    <div class="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-400">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-sm text-gray-500 uppercase font-bold">Eventos Activos</p>
-                                <p class="text-2xl font-bold text-gray-800">8</p>
-                            </div>
-                            <div class="text-yellow-500 bg-yellow-100 p-3 rounded-full">
-                                <i class="fa-regular fa-calendar-check fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
+<script>
+const icon = document.getElementById("themeIcon");
 
-                    <!-- Tarjeta Inscripciones -->
-                    <div class="bg-white rounded-lg shadow p-5 border-l-4 border-purple-500">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-sm text-gray-500 uppercase font-bold">Inscripciones Hoy</p>
-                                <p class="text-2xl font-bold text-gray-800">45</p>
-                            </div>
-                            <div class="text-purple-500 bg-purple-100 p-3 rounded-full">
-                                <i class="fa-solid fa-file-signature fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
+function toggleTheme(){
+document.documentElement.classList.toggle("dark");
 
-                    <!-- Tarjeta Asistencia -->
-                    <div class="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-sm text-gray-500 uppercase font-bold">Asistencia Promedio</p>
-                                <p class="text-2xl font-bold text-gray-800">92%</p>
-                            </div>
-                            <div class="text-red-500 bg-red-100 p-3 rounded-full">
-                                <i class="fa-solid fa-clipboard-user fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+if(document.documentElement.classList.contains("dark")){
+icon.className="fa-solid fa-sun";
+icon.style.color="#ffffff";
+}else{
+icon.className="fa-solid fa-moon";
+icon.style.color="#334155";
+}
+}
+</script>
 
-                <!-- Tabla de Ejemplo (Pase de lista reciente) -->
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="font-bold text-gray-800">Actividad Reciente - Pase de Lista</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-left text-sm whitespace-nowrap">
-                            <thead class="uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50 text-gray-600">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">Evento</th>
-                                    <th scope="col" class="px-6 py-3">Usuario</th>
-                                    <th scope="col" class="px-6 py-3">Estado</th>
-                                    <th scope="col" class="px-6 py-3">Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4">Taller de Python</td>
-                                    <td class="px-6 py-4">Juan Pérez</td>
-                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Presente</span></td>
-                                    <td class="px-6 py-4 text-gray-500">10:00 AM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4">Conferencia Web</td>
-                                    <td class="px-6 py-4">Ana García</td>
-                                    <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Ausente</span></td>
-                                    <td class="px-6 py-4 text-gray-500">10:05 AM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4">Taller de Python</td>
-                                    <td class="px-6 py-4">Carlos López</td>
-                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Presente</span></td>
-                                    <td class="px-6 py-4 text-gray-500">10:12 AM</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {% endblock %}
-            </main>
-
-            <!-- FOOTER -->
-            <footer class="bg-white border-t border-gray-200 p-4 text-center text-sm text-gray-500">
-                &copy; 2025 Sistema de Gestión de Eventos. Todos los derechos reservados.
-            </footer>
-
-        </div>
-        
-        <!-- Overlay para móvil (fondo oscuro cuando se abre el menú) -->
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden glass"></div>
-
-    </div>
-
-    <!-- Script para funcionalidad del menú móvil -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-            function toggleSidebar() {
-                const isClosed = sidebar.classList.contains('-translate-x-full');
-                if (isClosed) {
-                    sidebar.classList.remove('-translate-x-full');
-                    sidebarOverlay.classList.remove('hidden');
-                } else {
-                    sidebar.classList.add('-translate-x-full');
-                    sidebarOverlay.classList.add('hidden');
-                }
-            }
-
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            sidebarOverlay.addEventListener('click', toggleSidebar);
-        });
-    </script>
 </body>
 </html>
