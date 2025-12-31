@@ -26,7 +26,7 @@
       <div>
           <label>Periodo de pago</label>
           <select id="periodo" required>
-              <option value="">Seleccione</option>
+              <option value="">Seleccione</option> 
               <option value="07 Ene - 21 Feb|1500">07 Ene - 21 Feb $1500</option>
               <option value="22 Feb - 31 Mar|1700">22 Feb - 31 Mar $1700</option>
               <option value="31 Mar - 26 Abr|1900">31 Mar - 26 Abr $1900</option>
@@ -78,7 +78,15 @@ form {
 }
 label { font-size: 14px; color: #444; }
 input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px; }
-button { padding: 10px; border: none; border-radius: 10px; background: #52658c; color: #fff; font-size: 16px; cursor: pointer; }
+button { 
+    padding: 10px; 
+    border: none; 
+    border-radius: 10px; 
+    background: #52658c; 
+    color: #fff; 
+    font-size: 16px; 
+    cursor: pointer; 
+}
 button:hover { background: #5b83a5; }
 button:focus { outline: none; }
 .submit-container { grid-column: 1 / -1; text-align: center; margin-top: 10px; }
@@ -126,6 +134,19 @@ th { background: #eaeaeab9; }
 .dark th { background: rgba(255, 255, 255, 0.06); }
 .dark .popup { color: #fff; }
 
+/* === CORRECCIÓN ICONO HEADER (SIN FONDO) === */
+header .profile button{
+    background: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+header .profile button i{
+    background: none !important;
+    color: var(--text-main) !important;
+    font-size: 22px;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     form { grid-template-columns: 1fr; }
@@ -138,6 +159,7 @@ th { background: #eaeaeab9; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
 <script>
 const form = document.getElementById('form');
 const tabla = document.getElementById('tabla');
@@ -165,14 +187,12 @@ form.addEventListener('submit', function(e) {
         return;
     }
 
-    // Validación: No permitir mismo nombre
     if(inscritos.some(p => p.nombre.toLowerCase() === nombre.toLowerCase())){
         showPopup("Ya existe un registro con el mismo nombre");
         form.reset();
         return;
     }
 
-    // Validación: No permitir mismo número de teléfono
     if(inscritos.some(p => p.telefono === telefono)){
         showPopup("Ya existe un registro con el mismo número de teléfono");
         form.reset();
@@ -198,17 +218,6 @@ form.addEventListener('submit', function(e) {
             width: 100,
             height: 100
         });
-        setTimeout(() => {
-            const qrImg = qrDiv.querySelector('img');
-            if(qrImg){
-                const link = document.createElement('a');
-                link.href = qrImg.src;
-                link.download = `${nombre}.png`;
-                link.textContent = 'Descargar QR';
-                qrDiv.appendChild(document.createElement('br'));
-                qrDiv.appendChild(link);
-            }
-        }, 100);
     };
 
     qrDiv.appendChild(qrButton);
