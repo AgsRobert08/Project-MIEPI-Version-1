@@ -7,7 +7,6 @@
 <div class="container">
 
   <section class="form-card">
-    <h2 style="margin-bottom:15px;">Registros</h2>
 
     <div class="table-responsive">
       <table>
@@ -17,7 +16,7 @@
             <th>Sub Zona</th>
             <th>Teléfono</th>
             <th>Grado</th>
-            <th>Periodo</th>
+            <th>Monto</th>
             <th>QR</th>
           </tr>
         </thead>
@@ -28,7 +27,7 @@
             <td>{{ i.subzona }}</td>
             <td>{{ i.telefono }}</td>
             <td>{{ i.grado }}</td>
-            <td>{{ i.periodo }}</td>
+            <td>{{ i.monto }}</td>
             <td>
               {% if i.qr_image %}
                 <div class="qr-container">
@@ -57,13 +56,8 @@
 </div>
 
 <style>
-/* reutilizando tu diseño */
-.form-card {
-    background: #ffffff6f;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-}
+
+
 
 .table-responsive { overflow-x: auto; }
 
@@ -75,13 +69,11 @@ table {
 
 th, td {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #fffefe8a;
     text-align: center;
 }
 
-th {
-    background: #eaeaeab9;
-}
+
 
 .qr-container img {
     border-radius: 6px;

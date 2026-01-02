@@ -15,157 +15,277 @@
   </div>
 {% endif %}
 
-  <!-- FORMULARIO -->
-  <section id="registro" class="form-card">
-    <form method="POST" action="{% url 'miepi:inscrito_create' %}" id="form">
-      {% csrf_token %}
+<section id="registro" class="form-card">
+<form method="POST" action="{% url 'miepi:inscrito_create' %}" id="form">
+{% csrf_token %}
 
-      <div>
-        <label>Nombre Completo</label>
-        <input type="text" name="nombre" id="nombre" required>
-      </div>
+<div>
+<label>Nombre Completo</label>
+<input type="text" name="nombre" id="nombre" required>
+</div>
 
-      <div>
-        <label>Sub Zona</label>
-        <input type="text" name="subzona" id="subzona" required>
-      </div>
+<div>
+<label>Sub Zona</label>
+<input type="text" name="subzona" id="subzona" required>
+</div>
 
-      <div>
-        <label>Teléfono</label>
-        <input type="tel" name="telefono" id="telefono" required>
-      </div>
+<div>
+<label>Correo electrónico</label>
+<input type="email" name="correo" id="correo" required placeholder=>
+</div>
 
-      <div>
-        <label>Grado Eclesiástico</label>
-        <input type="text" name="grado" id="grado" required>
-      </div>
+<div>
+<label>Teléfono</label>
+<input type="tel" name="telefono" id="telefono" required placeholder=>
+</div>
 
-      <div>
-        <label>Periodo de pago</label>
-        <select id="periodo_select" required>
-          <option value="">Seleccione</option>
-          <option value="07 Ene - 21 Feb|1500">07 Ene - 21 Feb — $1500</option>
-          <option value="22 Feb - 31 Mar|1700">22 Feb - 31 Mar — $1700</option>
-          <option value="31 Mar - 26 Abr|1900">31 Mar - 26 Abr — $1900</option>
-        </select>
-      </div>
+<div>
+<label>Grado Eclesiástico</label>
+<input type="text" name="grado" id="grado" required>
+<small id="avisoCarta" style="display:none;color:#ba0303;font-size:13px;margin-top:6px">
+Para los miembros de Iglesia y los de otra denominación, favor de presentar carta pastoral.
+</small>
+</div>
 
-      <!-- CAMPOS REALES QUE RECIBE DJANGO -->
-      <input type="hidden" name="periodo" id="periodo">
-      <input type="hidden" name="monto" id="monto">
+<div>
+<label>Periodo de pago</label>
+<select id="periodo_select" required>
+<option value="">Seleccione</option>
 
-      <div class="submit-container">
-        <button type="submit">Registrar</button>
-      </div>
-    </form>
-  </section>
+<option data-fin="2026-02-21" value="07 Ene - 21 Feb|1500">
+05 Ene - 07 Feb — $1,700.00
+</option>
 
+<option data-fin="2026-03-31" value="22 Feb - 31 Mar|1700">
+08 Feb - 21 Mar — $1,900.00
+</option>
+
+<option data-fin="2026-04-26" value="31 Mar - 26 Abr|1900">
+21 Mar - 13 Abr — $2,100.00
+</option>
+
+</select>
+</div>
+
+<input type="hidden" name="periodo" id="periodo">
+<input type="hidden" name="monto" id="monto">
+
+<div class="submit-container">
+  <button type="submit">Registrar</button>
+</div>
+
+
+</form>
+</section>
 </div>
 
 <div id="popup" class="popup"></div>
 
 <style>
-/* === FORMULARIO === */
+/* FORM-CARD */
 .form-card {
-    background: #ffffff6f;
+    background: rgba(255, 255, 255, 0.7); /* modo claro transparente */
     padding: 24px;
     border-radius: 12px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
     margin-bottom: 20px;
+    backdrop-filter: blur(16px);
+    transition: background 0.3s, color 0.3s;
 }
 
+/* FORMULARIO INTERNO */
 form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
 }
+label {
+    font-size: 14px;
+    color: #444; /* letra de etiqueta en modo claro */
+    transition: color 0.3s;
+}
 
-label { font-size: 14px; color: #444; }
-
+/* INPUTS Y SELECTS */
 input, select {
     width: 100%;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
     margin-top: 4px;
+    background: rgba(255,255,255,0.85); /* fondo claro semi-transparente */
+    color: #334155; /* letra en modo claro */
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-button {
-    padding: 10px;
+/* OPTION DESHABILITADA */
+select option:disabled {
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+/* BOTONES HEADER */
+header button {
+    background: transparent;
     border: none;
-    border-radius: 10px;
-    background: #52658c;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
+    padding: 0;
 }
 
-button:hover { background: #5b83a5; }
-
-.submit-container {
-    grid-column: 1 / -1;
-    text-align: center;
-    margin-top: 10px;
+/* MODO OSCURO: FORM-CARD Y CAMPOS */
+.dark .form-card {
+    background: rgba(2, 6, 23, 0.8); /* fondo oscuro transparente */
+    color: var(--text-main);
+}
+.dark label {
+    color: #e5e7eb; /* letra de etiqueta más clara */
+}
+/* MODO OSCURO: FORM-CARD Y CAMPOS */
+.dark .form-card input,
+.dark .form-card select,
+.dark .form-card textarea {
+    background: rgba(255, 255, 255, 0.15) !important; /* fondo semi-claro dentro del form-card oscuro */
+    color: #e5e7eb !important; /* texto claro */
+    border: 1px solid var(--border-main) !important;
 }
 
-/* POPUP */
-.popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: #ff6b6b;
-    color: #fff;
-    padding: 16px 24px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s ease;
-    z-index: 9999;
+/* Labels dentro de form-card en modo oscuro */
+.dark .form-card label {
+    color: #e5e7eb !important;
 }
 
-.popup.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+
+
+/* Botón del formulario */
+#registro button{
+  padding:10px 26px;
+  border:none;
+  border-radius:10px;
+  background:#52658c;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    form { grid-template-columns: 1fr; }
+#registro button:hover{
+  background:#5b83a5;
+}
+.submit-container{
+  grid-column: 1 / -1;   /* ocupa las 2 columnas del formulario */
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
 }
 
-.alert {
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    text-align: center;
+.popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(.8);
+background:#ff6b6b;
+color:#fff;
+padding:16px 24px;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+opacity:0;
+pointer-events:none;
+transition:.3s;
+z-index:9999;
 }
-.alert.success { background: #4aa3f0; color: #fff; }
-.alert.error { background: #ff6b6b; color: #fff; }
-
+.popup.show{
+opacity:1;
+transform:translate(-50%,-50%) scale(1);
+}
+@media(max-width:768px){
+form{grid-template-columns:1fr}
+}
+.alert{
+padding:10px;
+border-radius:8px;
+margin-bottom:10px;
+text-align:center;
+}
+.alert.success{background:#4aa2f086;color:#fff}
+.alert.error{background:#e00202;color:#fff}
 </style>
 
 <script>
-const selectPeriodo = document.getElementById('periodo_select');
-const inputPeriodo  = document.getElementById('periodo');
-const inputMonto    = document.getElementById('monto');
-const popup = document.getElementById('popup');
+/* ====== DESHABILITAR PERIODOS VENCIDOS (AÑO ACTUAL) ====== */
+const hoy = new Date();
+const anioActual = hoy.getFullYear();
 
-selectPeriodo.addEventListener('change', function () {
-    if (!this.value) return;
+document.querySelectorAll('#periodo_select option[data-fin]').forEach(op => {
+    const [mes, dia] = op.dataset.fin.split('-');
 
-    const [periodo, monto] = this.value.split('|');
-    inputPeriodo.value = periodo;
-    inputMonto.value = monto;
+    // Fecha final con el año actual
+    let fechaFin = new Date(anioActual, mes - 1, dia, 23, 59, 59);
+
+    // Si aún estamos en diciembre y el periodo es de enero–abril,
+    // se asume que pertenece al siguiente año
+    if (hoy.getMonth() === 11 && mes < 6) {
+        fechaFin.setFullYear(anioActual + 1);
+    }
+
+    if (hoy > fechaFin) {
+        op.disabled = true;
+    }
 });
 
-// popup opcional
-function showPopup(msg, color="#4aa3f0") {
-    popup.textContent = msg;
-    popup.style.background = color;
-    popup.classList.add('show');
-    setTimeout(() => popup.classList.remove('show'), 1200);
+/* ====== PERIODO ====== */
+const selectPeriodo=document.getElementById('periodo_select');
+const inputPeriodo=document.getElementById('periodo');
+const inputMonto=document.getElementById('monto');
+
+selectPeriodo.addEventListener('change',()=>{
+if(!selectPeriodo.value)return;
+const [fecha,costo]=selectPeriodo.value.split('|');
+inputPeriodo.value=fecha;
+inputMonto.value=costo;
+});
+
+/* ====== VALIDACIONES TEXTO ====== */
+function validarTexto(i){
+i.addEventListener('input',()=>{
+let v=i.value;
+v=v.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ.\s]/g,'');
+v=v.replace(/\s{2,}/g,' ');
+v=v.replace(/\.{2,}/g,'.');
+i.value=v;
+});
 }
+validarTexto(nombre);
+validarTexto(subzona);
+validarTexto(grado);
+
+/* ====== AVISO CARTA ====== */
+grado.addEventListener('input',()=>{
+const v=grado.value.toLowerCase();
+avisoCarta.style.display=
+v.includes('miembro')||
+v.includes('otra denominacion')||
+v.includes('otra denominación')
+?'block':'none';
+});
+
+/* ====== TELEFONO ====== */
+telefono.addEventListener('input',()=>{
+let v=telefono.value.replace(/[^\d+]/g,'');
+if(v.indexOf('+')>0)v=v.replace(/\+/g,'');
+let d=v.replace('+','');
+if(d.length>15)d=d.slice(0,15);
+telefono.value=(v.startsWith('+')?'+':'')+d;
+});
+
+/* ====== CORREO ====== */
+correo.addEventListener('input',()=>{
+correo.value=correo.value.replace(/\.{2,}|@{2,}/g,'');
+});
+
+/* ====== VALIDACION FINAL ====== */
+form.addEventListener('submit',(e)=>{
+const d=telefono.value.replace('+','');
+if(d.length<10||d.length>15){
+e.preventDefault();
+alert('El teléfono debe tener entre 10 y 15 dígitos.');
+}
+});
 </script>
 {% endblock %}
