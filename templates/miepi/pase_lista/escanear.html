@@ -1,0 +1,79 @@
+{% extends "miepi/base.html" %}
+{% block title %}Escanear QR{% endblock %}
+{% block content %}
+
+<h2 style="text-align:center;">Escanear Pase de Lista</h2>
+
+<video id="video" width="100%" autoplay></video>
+<canvas id="canvas" hidden></canvas>
+
+<div id="resultado" style="text-align:center; margin-top:15px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const resultado = document.getElementById('resultado');
+let scanning = true;
+let stream = null;
+
+navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "environment" }
+}).then(s => {
+    stream = s;
+    video.srcObject = s;
+});
+
+function scan() {
+    if (!scanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
+        requestAnimationFrame(scan);
+        return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+    if (code) {
+        scanning = false;
+        registrar(code.data);
+    }
+
+    requestAnimationFrame(scan);
+}
+
+video.addEventListener('loadedmetadata', scan);
+
+function registrar(codigo) {
+    fetch("{% url 'miepi:registrar_asistencia' %}", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "codigo=" + encodeURIComponent(codigo)
+    })
+    .then(r => r.json())
+    .then(data => {
+        resultado.innerHTML = data.msg;
+        resultado.style.color = data.ok ? "green" : "red";
+
+        // Detener cámara
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+        }
+    })
+    .catch(err => {
+        resultado.innerHTML = "❌ Error al registrar asistencia";
+        resultado.style.color = "red";
+        console.error(err);
+    });
+}
+</script>
+
+{% endblock %}

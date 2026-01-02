@@ -7,7 +7,6 @@
 <div class="container">
 
   <section class="form-card">
-    <h2 style="margin-bottom:15px;">Registros</h2>
 
     <div class="table-responsive">
       <table>
@@ -19,6 +18,7 @@
             <th>Grado</th>
             <th>Periodo</th>
             <th>QR</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -41,6 +41,22 @@
               {% else %}
                 <span>—</span>
               {% endif %}
+            </td>
+            <td style="padding:8px; text-align:center;">
+                
+                <!-- BOTÓN ELIMINAR y aqui meteremos el de editar el registro -->
+                <form method="post"
+                      action="{% url 'miepi:eliminar_registros' i.id %}"
+                      class="swal-delete"
+                      data-nombre="{{ i.nombre }}"
+                      style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit"
+                            style="background:#e74c3c; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                        🗑️
+                    </button>
+                </form>
+
             </td>
           </tr>
           {% empty %}
@@ -102,4 +118,52 @@ th {
     background: #3780c0;
 }
 </style>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* === CONFIRMAR ELIMINACIÓN === */
+    document.querySelectorAll('.swal-delete').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const nombre = form.dataset.nombre;
+
+            Swal.fire({
+                title: '¿Eliminar registro?',
+                text: `Registro de ${nombre}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#d33'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+});
+</script>
+
+{% if messages %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* === MENSAJES DJANGO === */
+    {% for message in messages %}
+    Swal.fire({
+        icon: "{% if 'success' in message.tags %}success{% elif 'warning' in message.tags %}warning{% else %}error{% endif %}",
+        title: "{{ message|escapejs }}",
+        timer: 1800,
+        showConfirmButton: false
+    });
+    {% endfor %}
+
+});
+</script>
+{% endif %}
 {% endblock %}

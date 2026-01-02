@@ -76,6 +76,20 @@ class Inscrito(models.Model):
     qr_image = models.ImageField(upload_to=qr_upload_path, blank=True, null=True)
 
     fecha_registro = models.DateTimeField(auto_now_add=True)
-
+    correo_electronico = models.CharField(max_length=100, blank=True, null=True)
     def __str__(self):
         return self.nombre
+    
+    # models.py
+# models.py
+class Asistencia(models.Model):
+    inscrito = models.ForeignKey(Inscrito, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    hora = models.TimeField(auto_now_add=True)
+    asistio = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('inscrito', 'fecha')
+
+    def __str__(self):
+        return f"{self.inscrito.nombre} - {self.fecha}"

@@ -32,4 +32,5 @@ class InscritoForm(forms.ModelForm):
             'grado',
             'periodo',
             'monto',
+            'correo_electronico',
         ]

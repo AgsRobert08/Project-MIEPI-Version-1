@@ -8,6 +8,9 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <style>
 :root{
@@ -173,6 +176,7 @@ button{background:none;border:none;cursor:pointer}
 
 </style>
 </head>
+{% block extra_js %}{% endblock %}
 
 <body>
 <div class="wrapper">
@@ -190,7 +194,8 @@ EBV
 
 <p>Módulos</p>
 <a href="{% url 'miepi:inscritos_list' %}"><i class="fa-solid fa-file-signature"></i>Lista de Inscritos</a>
-<a href="#"><i class="fa-solid fa-clipboard-user"></i>Pase de lista</a>
+<a href="{% url 'miepi:escanear_asistencia' %}"><i class="fa-solid fa-clipboard-user"></i>Pase de lista</a>
+<a href="{% url 'miepi:lista_asistencias' %}"><i class="fa-solid fa-clipboard-user"></i>Asistencias</a>
 </nav>
 </aside>
 
