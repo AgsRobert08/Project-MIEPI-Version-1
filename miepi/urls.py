@@ -25,6 +25,11 @@ urlpatterns = [
     path('asistencia/eliminar/<int:id>/',views.eliminar_asistencia,name='eliminar_asistencia'),
 # urls.py
     path('asistencia/registrar-manual/',views.registrar_asistencia_manual,name='registrar_asistencia_manual'),
+    path('inscritos/editar/<int:pk>/', views.InscritoUpdateView.as_view(), name='editar_inscrito'),
+    path('buscar-inscrito/', views.buscar_inscrito, name='buscar_inscrito'),
+    path('asistencias/pdf/',views.AsistenciaPDFView.as_view(),name='asistencias_pdf'),
+    path('inscritos/pdf/',views.RegistrosPDFView.as_view(),name='inscritos_pdf'),
+
 
 
 ]

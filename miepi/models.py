@@ -1,7 +1,8 @@
 from django.db import models
+import uuid
+
 
 class Inscripciones(models.Model):
-    # Opciones para el campo de pago y periodo
     OPCIONES_PAGO = [
         ('Sí', 'Sí'),
         ('No', 'No'),
@@ -14,7 +15,6 @@ class Inscripciones(models.Model):
         ('Tercer periodo|1900', '31 Mar - 26 Abr | $1,900'),
     ]
 
-    # Opciones para el curso (Solo una opción como pediste)
     OPCIONES_CURSO = [
         ('Curso de Abril 2026', 'Curso de Abril 2026'),
     ]
@@ -23,23 +23,21 @@ class Inscripciones(models.Model):
     subzona = models.CharField(max_length=100)
     telefono = models.CharField(max_length=15)
     grado_eclesiastico = models.CharField(max_length=100)
-    
-    # Campo con opción única y valor por defecto
+
     curso = models.CharField(
-        max_length=100, 
-        choices=OPCIONES_CURSO, 
+        max_length=100,
+        choices=OPCIONES_CURSO,
         default='Curso de Abril 2026'
     )
-    
+
     pago = models.CharField(max_length=2, choices=OPCIONES_PAGO)
     periodo_pago = models.CharField(max_length=50, choices=OPCIONES_PERIODO, blank=True, null=True)
-    
+
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.nombre_completo} - {self.curso}"
 
-    # Método auxiliar para obtener el monto limpio (opcional)
     def obtener_monto(self):
         if self.periodo_pago and '|' in self.periodo_pago:
             return self.periodo_pago.split('|')[1]
@@ -49,24 +47,39 @@ class Inscripciones(models.Model):
         if self.periodo_pago and '|' in self.periodo_pago:
             return self.periodo_pago.split('|')[0]
         return "No pagó"
-    
+
+
 class Cursos(models.Model):
     name = models.CharField(max_length=100, blank=True)
     description = models.CharField(max_length=100, blank=True)
     start_date = models.DateField(blank=True)
     end_date = models.DateField(blank=True)
 
-import uuid
-from django.db import models
 
 def qr_upload_path(instance, filename):
     return f"qr/inscritos/{instance.codigo}.png"
 
+
 class Inscrito(models.Model):
     codigo = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-
     nombre = models.CharField(max_length=150)
-    subzona = models.CharField(max_length=100)
+
+    # 🔹 Campo género agregado
+    genero = models.CharField(
+        max_length=10,
+        choices=[('Masculino', 'Masculino'), ('Femenino', 'Femenino')],
+    )
+
+    zona = models.CharField(max_length=100, blank=True, null=True)
+    subzona = models.CharField(max_length=100, blank=True, null=True)
+
+    otra_denominacion = models.CharField(
+        max_length=2,
+        choices=[('Sí', 'Sí'), ('No', 'No')],
+        default='No'
+    )
+    denominacion = models.CharField(max_length=150, blank=True, null=True)
+
     telefono = models.CharField(max_length=20, unique=True)
     grado = models.CharField(max_length=100)
 
@@ -77,11 +90,11 @@ class Inscrito(models.Model):
 
     fecha_registro = models.DateTimeField(auto_now_add=True)
     correo_electronico = models.CharField(max_length=100, blank=True, null=True)
+
     def __str__(self):
         return self.nombre
-    
-    # models.py
-# models.py
+
+
 class Asistencia(models.Model):
     inscrito = models.ForeignKey(Inscrito, on_delete=models.CASCADE)
     fecha = models.DateField()

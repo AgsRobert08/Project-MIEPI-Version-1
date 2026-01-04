@@ -1,79 +1,151 @@
 {% extends "miepi/base.html" %}
 {% block title %}Escanear QR{% endblock %}
+
 {% block content %}
 
 <h2 style="text-align:center;">Escanear Pase de Lista</h2>
 
-<video id="video" width="100%" autoplay></video>
+<video id="video" width="100%" autoplay playsinline></video>
 <canvas id="canvas" hidden></canvas>
 
 <div id="resultado" style="text-align:center; margin-top:15px;"></div>
 
+
+<!-- jsQR -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+
 <script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const resultado = document.getElementById('resultado');
-let scanning = true;
-let stream = null;
+document.addEventListener('DOMContentLoaded', function () {
 
-navigator.mediaDevices.getUserMedia({
-    video: { facingMode: "environment" }
-}).then(s => {
-    stream = s;
-    video.srcObject = s;
-});
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-function scan() {
-    if (!scanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
-        requestAnimationFrame(scan);
-        return;
+    const soundOk = document.getElementById('sound-ok');
+    const soundError = document.getElementById('sound-error');
+
+    let scanning = true;
+    let stream = null;
+
+    /* === ENCENDER CÁMARA === */
+    function iniciarCamara() {
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        }).then(s => {
+            stream = s;
+            video.srcObject = s;
+            video.play();
+            requestAnimationFrame(scan);
+        }).catch(() => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cámara no disponible',
+                text: 'No se pudo acceder a la cámara'
+            });
+        });
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-    if (code) {
-        scanning = false;
-        registrar(code.data);
-    }
-
-    requestAnimationFrame(scan);
-}
-
-video.addEventListener('loadedmetadata', scan);
-
-function registrar(codigo) {
-    fetch("{% url 'miepi:registrar_asistencia' %}", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}",
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "codigo=" + encodeURIComponent(codigo)
-    })
-    .then(r => r.json())
-    .then(data => {
-        resultado.innerHTML = data.msg;
-        resultado.style.color = data.ok ? "green" : "red";
-
-        // Detener cámara
+    /* === DETENER CÁMARA === */
+    function detenerCamara() {
         if (stream) {
             stream.getTracks().forEach(t => t.stop());
+            stream = null;
         }
-    })
-    .catch(err => {
-        resultado.innerHTML = "❌ Error al registrar asistencia";
-        resultado.style.color = "red";
-        console.error(err);
-    });
-}
+    }
+
+    /* === ESCANEAR === */
+    function scan() {
+        if (!scanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
+            requestAnimationFrame(scan);
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (code) {
+            scanning = false;
+            registrar(code.data);
+        }
+
+        requestAnimationFrame(scan);
+    }
+
+    /* === REGISTRAR ASISTENCIA === */
+    function registrar(codigo) {
+        fetch("{% url 'miepi:registrar_asistencia' %}", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "codigo=" + encodeURIComponent(codigo)
+        })
+        .then(r => r.json())
+        .then(data => {
+
+            if (data.ok) {
+                soundOk?.play();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Asistencia registrada',
+                    text: data.msg,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => {
+                    reiniciarEscaneo();
+                }, 2000);
+
+            } else {
+                soundError?.play();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: data.msg,
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => {
+                    reiniciarEscaneo();
+                }, 2500);
+            }
+        })
+        .catch(() => {
+            soundError?.play();
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo registrar la asistencia'
+            });
+
+            setTimeout(() => {
+                reiniciarEscaneo();
+            }, 2500);
+        });
+    }
+
+    /* === REINICIAR ESCANEO === */
+    function reiniciarEscaneo() {
+        detenerCamara();
+        scanning = true;
+        iniciarCamara();
+    }
+
+    /* === INICIO === */
+    iniciarCamara();
+
+});
 </script>
 
 {% endblock %}

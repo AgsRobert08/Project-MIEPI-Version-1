@@ -8,9 +8,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
 <style>
 :root{
@@ -23,7 +21,6 @@
   --icon-color:#334155;
   --table-head:rgba(0,0,0,.04);
 }
-
 .dark{
   --bg-main:linear-gradient(135deg,#020617,#1e293b);
   --bg-glass:rgba(2,6,23,.75);
@@ -54,6 +51,7 @@ body{
   border-right:1px solid var(--border-main);
   display:flex;
   flex-direction:column;
+  transition:left 0.3s ease;
 }
 .logo{
   height:64px;
@@ -90,16 +88,12 @@ nav a:hover{
   color:var(--text-main);
 }
 
-/* Logout */
-.logout{
-  padding:10px;
-  border-top:1px solid var(--border-main);
-}
+
 .logout button{
   display:flex;
   align-items:center;
   gap:10px;
-  padding:12px;
+  padding:10px;
   border-radius:10px;
   color:#dc2626;
   background:none;
@@ -126,7 +120,9 @@ header{
   justify-content:space-between;
   padding:0 20px;
   position:relative;
+  z-index:1000;
 }
+.header-left{display:flex;align-items:center;gap:10px;}
 .header-left img{height:32px;}
 .header-title{
   flex:1;
@@ -152,6 +148,7 @@ main{
   flex:1;
   padding:24px;
   overflow-y:auto;
+  overflow-x:auto; /* permite scroll horizontal si tabla es ancha */
 }
 
 /* Cards */
@@ -278,38 +275,72 @@ label{color:#444; font-size:14px;}
   color: var(--text-main) !important;
 }
 
-/* Responsive */
+/* Sidebar y botón hamburguesa */
+@media (max-width:1024px){
+  #sidebar{
+    position: fixed;
+    top:0;
+    left:-260px;
+    height:100%;
+    z-index:999;
+  }
+  #sidebar.show{left:0;}
+  .sidebar-overlay{
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.4);
+    z-index:998;
+    display:none;
+  }
+  .sidebar-overlay.show{display:block;}
+  .main{margin-left:0;}
+  .sidebar-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px;
+    margin-right:10px;
+    background: var(--bg-glass);
+    border-radius:8px;
+    cursor:pointer;
+  }
+}
+
+@media (min-width:1025px){
+  .sidebar-toggle{display:none !important;}
+}
+
+/* Tablas responsivas sin amontonar */
+table{width:100%;border-collapse:collapse;}
+table th, table td{padding:10px;vertical-align:middle;}
+table td .action-btn{margin-right:8px;}
+
+/* Para móviles: scroll horizontal */
 @media(max-width:768px){
-  .wrapper{flex-direction:column;}
-  #sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border-main);}
-  header{padding:0 12px;}
-  .cards{grid-template-columns:1fr;}
-  table th, table td{padding:10px;font-size:12px;}
+  table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+  table td{display:inline-flex;gap:6px;flex-wrap:wrap;align-items:center;}
 }
 </style>
 
 <script>
-// Aplicar tema antes de cargar para evitar flash
 if(localStorage.getItem("theme")==="dark"){
   document.documentElement.classList.add("dark");
 }
 </script>
 
 </head>
-{% block extra_js %}{% endblock %}
-
 <body>
 <div class="wrapper">
 
 <aside id="sidebar">
-<div class="logo">
-EBV
-</div>
+<div class="logo">EBV</div>
 
 <nav>
 <p>Principal</p>
 <a href="{% url 'miepi:dashboard' %}"><i class="fa-solid fa-gauge"></i>Registro</a>
-
 <p>Módulos</p>
 <a href="{% url 'miepi:inscritos_list' %}"><i class="fa-solid fa-file-signature"></i>Lista de Inscritos</a>
 <a href="{% url 'miepi:escanear_asistencia' %}"><i class="fa-solid fa-clipboard-user"></i>Pase de lista</a>
@@ -324,17 +355,17 @@ EBV
 </div>
 </aside>
 
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="main">
 
 <header>
 <div class="header-left">
+  <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
   <img src="https://www.miepi.com/images/1miepi/LogoMIEPI.png" alt="Logo Izquierdo">
 </div>
-
 <div class="header-title">{% block header_title %}Pase de Lista{% endblock %}</div>
-
 <div class="header-right">
-  <div class="avatar">{{ usuario_inicial }}</div>
   <img src="https://www.miepi.com/images/4ebv/logoEBV.png" alt="Logo Derecho" style="height:32px;">
   <button onclick="toggleTheme()">
     <i id="themeIcon" class="fa-solid fa-moon" style="color:var(--icon-color)"></i>
@@ -343,9 +374,7 @@ EBV
 </header>
 
 <main>
-{% block content %}
-<!-- Cards, formularios y tablas aquí -->
-{% endblock %}
+{% block content %}{% endblock %}
 </main>
 
 <footer>© 2025 Sistema EBV</footer>
@@ -354,6 +383,11 @@ EBV
 </div>
 
 <script>
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('show');
+  document.querySelector('.sidebar-overlay').classList.toggle('show');
+}
+
 function toggleTheme(){
   const html=document.documentElement;
   html.classList.toggle("dark");
@@ -368,6 +402,6 @@ function toggleTheme(){
   localStorage.setItem("theme", html.classList.contains("dark")?"dark":"light");
 }
 </script>
-
+{% block extra_js %}{% endblock %}
 </body>
 </html>

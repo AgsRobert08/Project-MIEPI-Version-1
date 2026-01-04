@@ -1,0 +1,38 @@
+{% extends "miepi/base.html" %}
+
+{% block title %}Editar Inscrito{% endblock %}
+{% block header_title %}Editar Registro{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:600px; margin:auto;">
+
+  <h3 style="margin-bottom:15px;">↺ Editar Inscrito</h3>
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div style="margin-bottom:12px;">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <small style="color:red;">{{ field.errors|striptags }}</small>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button type="submit"
+              style="background:#4aa3f0; color:#fff; padding:10px 16px; border:none; border-radius:8px;">
+        Guardar cambios
+      </button>
+
+      <a href="{% url 'miepi:inscritos_list' %}"
+         style="padding:10px 16px; border-radius:8px; background:#ccc; text-decoration:none;">
+        Cancelar
+      </a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

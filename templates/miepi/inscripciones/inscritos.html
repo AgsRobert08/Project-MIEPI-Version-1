@@ -8,14 +8,46 @@
 
   <section class="form-card">
 
-    <div class="table-responsive">
-      <table>
+    <a href="{% url 'miepi:inscritos_pdf' %}?genero={{ request.GET.genero }}"
+   class="btn-pdf">
+   Exportar PDF
+</a>
+
+    <!-- FILTRO POR GÉNERO COMO INTERRUPTOR DIGITAL -->
+    <div class="filtro-toggle">
+      <label class="toggle-switch">
+        <input type="radio" name="genero" value="" {% if not request.GET.genero %}checked{% endif %} onchange="filtrarGenero('')">
+        <span class="slider"></span>
+        <span class="label-text">Todos</span>
+      </label>
+      <label class="toggle-switch">
+        <input type="radio" name="genero" value="Masculino" {% if request.GET.genero == 'Masculino' %}checked{% endif %} onchange="filtrarGenero('Masculino')">
+        <span class="slider"></span>
+        <span class="label-text">Masculino</span>
+      </label>
+      <label class="toggle-switch">
+        <input type="radio" name="genero" value="Femenino" {% if request.GET.genero == 'Femenino' %}checked{% endif %} onchange="filtrarGenero('Femenino')">
+        <span class="slider"></span>
+        <span class="label-text">Femenino</span>
+      </label>
+    </div>
+
+
+
+
+
+    <!-- TABLA DATATABLE -->
+    <div class="table">
+      <table id="inscritosTable" class="display nowrap" style="width:100%;">
         <thead>
           <tr>
             <th>Nombre</th>
+            <th>Zona</th>
             <th>Sub Zona</th>
+            <th>Denominación</th>
             <th>Teléfono</th>
-            <th>Grado</th>
+            <th>Correo Electrónico</th>
+            <th>Grado Eclesiástico</th>
             <th>Monto</th>
             <th>QR</th>
             <th>Acciones</th>
@@ -25,43 +57,37 @@
           {% for i in inscritos %}
           <tr>
             <td>{{ i.nombre }}</td>
-            <td>{{ i.subzona }}</td>
+            <td>{% if i.zona %}{{ i.zona }}{% else %}—{% endif %}</td>
+            <td>{% if i.subzona %}{{ i.subzona }}{% else %}—{% endif %}</td>
+            <td>{% if i.denominacion %}{{ i.denominacion }}{% else %}NO{% endif %}</td>
             <td>{{ i.telefono }}</td>
+            <td>{{ i.correo_electronico }}</td>
             <td>{{ i.grado }}</td>
             <td>{{ i.monto }}</td>
             <td>
               {% if i.qr_image %}
-                <div class="qr-container">
-                  <img src="{{ i.qr_image.url }}" width="80">
-                  <br>
-                  <a href="{{ i.qr_image.url }}" download>
-                    <button class="qr-button">Descargar</button>
-                  </a>
-                </div>
-              {% else %}
-                <span>—</span>
-              {% endif %}
+              <div class="qr-container">
+                <img src="{{ i.qr_image.url }}" class="qr-img">
+                <a href="{{ i.qr_image.url }}" download>
+                  <button class="qr-button">Descargar</button>
+                </a>
+              </div>
+              {% else %}<span>—</span>{% endif %}
             </td>
-            <td style="padding:8px; text-align:center;">
-                
-                <!-- BOTÓN ELIMINAR y aqui meteremos el de editar el registro -->
-                <form method="post"
-                      action="{% url 'miepi:eliminar_registros' i.id %}"
-                      class="swal-delete"
-                      data-nombre="{{ i.nombre }}"
-                      style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit"
-                            style="background:#e74c3c; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">
-                        🗑️
-                    </button>
-                </form>
-
+            <td class="actions">
+              <a href="{% url 'miepi:editar_inscrito' i.id %}" class="action-btn edit">✏️</a>
+              <form method="post"
+                    action="{% url 'miepi:eliminar_registros' i.id %}"
+                    class="swal-delete"
+                    data-nombre="{{ i.nombre }}">
+                {% csrf_token %}
+                <button type="submit" class="action-btn delete">🗑️</button>
+              </form>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6">No hay registros</td>
+            <td colspan="10" style="text-align:center;">No hay registros</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -74,89 +100,132 @@
 
 <style>
 
-
-
-.table-responsive { overflow-x: auto; }
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
-}
-
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid #fffefe8a;
-    text-align: center;
-}
-
-
-
-.qr-container img {
-    border-radius: 6px;
-    margin-bottom: 5px;
-}
-
-.qr-button {
-    background: #4aa3f0;
-    font-size: 12px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: none;
+.btn-pdf {
+    display: inline-block;
+    background:linear-gradient(135deg,#2563eb,#1e3a8a);
     color: #fff;
-    cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+    float: right;               /* ← lo manda a la derecha */
 }
 
-.qr-button:hover {
-    background: #3780c0;
+.btn-pdf:hover {
+    background:linear-gradient(135deg,#6b96f3,#1e3a8a);
+    transform: translateY(-1px);
+}
+
+.btn-pdf:active {
+    transform: translateY(0);
+}
+
+/* Toggle switch */
+.filtro-toggle { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-bottom:20px; }
+.toggle-switch { display:flex; align-items:center; cursor:pointer; user-select:none; }
+.toggle-switch input { display:none; }
+.toggle-switch .slider { width:50px; height:24px; background:#ccc; border-radius:34px; margin-right:8px; position:relative; transition:0.3s; }
+.toggle-switch .slider::before { content:""; position:absolute; width:20px; height:20px; left:2px; bottom:2px; background:white; border-radius:50%; transition:0.3s; }
+.toggle-switch input:checked + .slider { background:#fbb034; }
+.toggle-switch input:checked + .slider::before { transform:translateX(26px); }
+.label-text { font-weight:500; font-size:0.9rem; white-space:nowrap; }
+
+/* Tabla */
+.table-responsive { overflow-x:auto; }
+.inscritos-table, #inscritosTable { width:100%; border-collapse:collapse; font-size:0.9rem; }
+.inscritos-table th, .inscritos-table td { padding:8px; text-align:left; word-wrap:break-word; }
+.inscritos-table th { background:#f5f5f5; }
+/* QR */
+.qr-container { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.qr-img { width:60px; height:auto; }
+.actions { display:flex; gap:4px; flex-wrap:wrap; }
+.action-btn { padding:4px 6px; font-size:0.9rem; cursor:pointer; }
+
+/* Responsive */
+@media (max-width:768px) {
+  .inscritos-table th, .inscritos-table td { font-size:0.8rem; padding:6px; }
+  .qr-img { width:50px; }
+}
+@media (max-width:480px) {
+  .filtro-switch { flex-direction:column; gap:10px; }
+  .inscritos-table th, .inscritos-table td { font-size:0.75rem; padding:4px; }
+  .qr-img { width:40px; }
 }
 </style>
 {% endblock %}
+
 {% block extra_js %}
+<!-- jQuery y DataTables (CDN) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link   rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+<link   rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"/>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* === CONFIRMAR ELIMINACIÓN === */
-    document.querySelectorAll('.swal-delete').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const nombre = form.dataset.nombre;
-
-            Swal.fire({
-                title: '¿Eliminar registro?',
-                text: `Registro de ${nombre}`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#d33'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        });
+    // Inicializa DataTable
+    $('#inscritosTable').DataTable({
+        responsive:true,
+        ordering:false,
+        language:{
+            lengthMenu: "Mostrar _MENU_ registros",
+            zeroRecords: "No se encontraron registros",
+            info: "Mostrando _START_ a _END_ de _TOTAL_",
+            infoEmpty: "No hay registros",
+            infoFiltered: "(filtrado de _MAX_ totales)",
+            search: "Buscar:",
+            paginate: { first:"Primero", last:"Último", next:"Siguiente", previous:"Anterior" }
+        }
     });
 
-});
-</script>
+    // Confirmar eliminación
+$(document).on('submit', '.swal-delete', function (e) {
+    e.preventDefault();
 
-{% if messages %}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+    const form = this;
+    const nombre = form.dataset.nombre;
 
-    /* === MENSAJES DJANGO === */
-    {% for message in messages %}
     Swal.fire({
-        icon: "{% if 'success' in message.tags %}success{% elif 'warning' in message.tags %}warning{% else %}error{% endif %}",
-        title: "{{ message|escapejs }}",
-        timer: 1800,
-        showConfirmButton: false
+        title: '¿Eliminar registro?',
+        text: `Registro de ${nombre}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
     });
-    {% endfor %}
+});
+
 
 });
+
+// Filtrar por género
+function filtrarGenero(genero){
+    const url = new URL(window.location.href);
+    if(genero) url.searchParams.set('genero', genero);
+    else url.searchParams.delete('genero');
+    window.location.href = url.toString();
+}
+
+// Mensajes con Swal
+document.addEventListener('DOMContentLoaded', function () {
+    {% if messages %}
+        {% for message in messages %}
+        Swal.fire({
+            icon: "{% if 'success' in message.tags %}success{% elif 'warning' in message.tags %}warning{% else %}error{% endif %}",
+            title: "{{ message|escapejs }}",
+            timer: 1800,
+            showConfirmButton: false
+        });
+        {% endfor %}
+    {% endif %}
+});
 </script>
-{% endif %}
 {% endblock %}
