@@ -88,23 +88,69 @@ nav a:hover{
   color:var(--text-main);
 }
 
+/* ===== BOTÓN MODO NOCTURNO (SIN FONDO) ===== */
+.header-right button {
+  background: transparent !important;
+  border: none !important;
+  padding: 6px;
+  border-radius: 0;
+  box-shadow: none;
+}
 
+.header-right button:hover,
+.header-right button:focus,
+.header-right button:active {
+  background: transparent !important;
+  box-shadow: none;
+}
+
+/* ===== LOGOUT IGUAL QUE LOS LINKS DEL SIDEBAR ===== */
 .logout button{
   display:flex;
   align-items:center;
   gap:10px;
-  padding:10px;
+  padding:12px;
+  width:100%;
   border-radius:10px;
   color:#dc2626;
   background:none;
   border:none;
   cursor:pointer;
   font-weight:600;
-  transition: all 0.3s;
+  text-align:left;
+  transition: all 0.3s ease;
 }
+
 .logout button:hover{
   background:rgba(220,38,38,.1);
 }
+/* ===== LOGOUT IGUALADO EN TODAS LAS VISTAS ===== */
+.logout {
+  padding: 10px;
+  border-top: 1px solid var(--border-main);
+}
+
+.logout button{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  width:100%;
+  border-radius:10px;
+  color:#dc2626;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  text-align:left;
+  white-space: nowrap;        /* ← evita doble fila */
+  transition: all 0.3s ease;
+}
+
+.logout button:hover{
+  background:rgba(220,38,38,.1);
+}
+
 
 /* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -197,39 +243,42 @@ footer{
   background:var(--bg-glass);
 }
 
-/* BOTONES GENERALES */
-button{
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-family:Inter,sans-serif;
+
+/* ===== NORMALIZAR BOTÓN LOGOUT EN TODAS LAS VISTAS ===== */
+.logout {
+  padding: 12px;
+  border-top: 1px solid var(--border-main);
 }
 
-/* Botón de modo oscuro y otros iconos */
-#themeIcon{
-  font-size:18px;
+.logout form {
+  margin: 0;
 }
 
-.logout button{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  flex-wrap: nowrap;
-  gap:6px;
-  padding:12px;
-  border-radius:10px;
-  color:#dc2626;
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-  width:120%;
-  box-sizing:border-box;
-  transition: all 0.3s;
+.logout button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  height: 44px;                 /* ← CLAVE: mismo alto siempre */
+  width: 100%;
+
+  padding: 0 14px;              /* padding horizontal fijo */
+  gap: 10px;
+
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+
+  color: #dc2626;
+  font-weight: 600;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: background 0.25s ease;
 }
 
-.logout button:hover{
-  background:rgba(220,38,38,.1);
+.logout button:hover {
+  background: rgba(223, 32, 32, 0.1);
 }
 
 /* FORM-CARD */
@@ -340,12 +389,24 @@ if(localStorage.getItem("theme")==="dark"){
 
 <nav>
 <p>Principal</p>
-<a href="{% url 'miepi:dashboard' %}"><i class="fa-solid fa-gauge"></i>Registro</a>
+<a href="{% url 'miepi:dashboard' %}">
+  <i class="fa-solid fa-gauge"></i>Registro
+</a>
+
 <p>Módulos</p>
-<a href="{% url 'miepi:inscritos_list' %}"><i class="fa-solid fa-file-signature"></i>Lista de Inscritos</a>
-<a href="{% url 'miepi:escanear_asistencia' %}"><i class="fa-solid fa-clipboard-user"></i>Pase de lista</a>
-<a href="{% url 'miepi:lista_asistencias' %}"><i class="fa-solid fa-clipboard-user"></i>Asistencias</a>
+<a href="{% url 'miepi:inscritos_list' %}">
+  <i class="fa-solid fa-file-signature"></i>Lista de Inscritos
+</a>
+
+<a href="{% url 'miepi:escanear_asistencia' %}">
+  <i class="fa-solid fa-qrcode"></i>Pase de lista
+</a>
+
+<a href="{% url 'miepi:lista_asistencias' %}">
+  <i class="fa-solid fa-person-rays"></i>Asistencias
+</a>
 </nav>
+
 
 <div class="logout">
 <form method="post" action="{% url 'miepi:logout' %}">
