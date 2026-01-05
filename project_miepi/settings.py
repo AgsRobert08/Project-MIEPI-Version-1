@@ -102,7 +102,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default='postgresql://postgres:root@localhost:5432/EBV_MIEPI',
         conn_max_age=600,
-        ssl_require=False
+        ssl_require=not DEBUG
     )
 }
 
