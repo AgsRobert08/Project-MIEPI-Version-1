@@ -308,11 +308,6 @@ class InscritosListView(LoginRequiredMixin, View):
         })
 
 
-from miepi.models import Inscrito
-
-for i in Inscrito.objects.all():
-    i.genero = i.genero.strip()
-    i.save()
 
     
 # views.py
