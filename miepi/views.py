@@ -290,12 +290,12 @@ class InscritosListView(LoginRequiredMixin, View):
 def get_inscritos_filtrados(request):
     genero = request.GET.get('genero', '').strip()
 
-    qs = Inscrito.objects.all()
+    qs = Inscrito.objects.all().order_by('nombre')
 
     if genero:
         qs = qs.filter(genero__iexact=genero)
 
-    return qs.order_by('-fecha_registro')
+    return qs.order_by('nombre')
 
 class InscritosListView(LoginRequiredMixin, View):
     template_name = "miepi/inscripciones/inscritos.html"
