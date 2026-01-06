@@ -175,15 +175,28 @@ def dashboard(request):
     return render(request, 'miepi/dashboard.html')
 
 
+from django.views import View
+from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.core.files import File
+from io import BytesIO
+import qrcode
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class InscritoCreateView(LoginRequiredMixin, View):
+
     def get(self, request):
         form = InscritoForm()
         return render(request, 'miepi/dashboard.html', {
             'form': form
         })
+
     def post(self, request):
         form = InscritoForm(request.POST)
 
@@ -211,56 +224,60 @@ class InscritoCreateView(LoginRequiredMixin, View):
             save=True
         )
 
-        # === ENVIAR CORREO ===
+        # === ENVÍO DE CORREO (PROTEGIDO) ===
         correo = (inscrito.correo_electronico or "").strip()
 
         if correo:
+            try:
+                asunto = "Confirmación de registro y código QR"
 
-            asunto = "Confirmación de registro y código QR"
+                denominacion_linea = (
+                    f"Denominación: {inscrito.denominacion}\n"
+                    if inscrito.denominacion else ""
+                )
 
-            denominacion_linea = (
-                f"Denominación: {inscrito.denominacion}\n"
-                if inscrito.denominacion else ""
-            )
+                mensaje = f"""
+Hola {inscrito.nombre},
 
-            mensaje = f"""
-        Hola {inscrito.nombre},
+Tu registro ha sido realizado correctamente.
+A continuación te compartimos tus datos:
 
-        Tu registro ha sido realizado correctamente.
-        A continuación te compartimos tus datos:
+DATOS DEL REGISTRO
+--------------------
+Nombre: {inscrito.nombre}
+Teléfono: {inscrito.telefono}
+Correo: {correo}
+Zona: {inscrito.zona}
+Subzona: {inscrito.subzona}
+Grado Eclesiástico: {inscrito.grado}
+{denominacion_linea}Monto: ${inscrito.monto}
 
-        DATOS DEL REGISTRO
-        --------------------
-        Nombre: {inscrito.nombre}
-        Teléfono: {inscrito.telefono}
-        Correo: {correo}
-        Zona: {inscrito.zona}
-        Subzona: {inscrito.subzona}
-        Grado Eclesiástico: {inscrito.grado}
-        {denominacion_linea}Monto: ${inscrito.monto}
+Adjuntamos tu código QR en este correo.
+Preséntalo el día del evento para el pase de lista.
 
-        📎 Adjuntamos tu código QR en este correo.
-        Preséntalo el día del evento para el pase de lista.
+Saludos cordiales.
+"""
 
-        Saludos cordiales.
-        """
+                email = EmailMessage(
+                    subject=asunto,
+                    body=mensaje,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[correo]
+                )
 
-            email = EmailMessage(
-                subject=asunto,
-                body=mensaje,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[correo]
-            )
+                # 🔒 Adjuntar SOLO si el archivo existe
+                if inscrito.qr_image and inscrito.qr_image.path:
+                    email.attach_file(inscrito.qr_image.path)
 
-            if inscrito.qr_image:
-                email.attach_file(inscrito.qr_image.path)
+                email.send(fail_silently=False)
 
-            email.send(fail_silently=True)
-
+            except Exception as e:
+                logger.error(f"Error enviando correo: {e}")
+                # No romper el flujo del usuario
 
         messages.success(
             request,
-            "Usuario registrado correctamente. QR generado y enviado al correo."
+            "Usuario registrado correctamente. QR generado."
         )
 
         return redirect('miepi:inscritos_list')
