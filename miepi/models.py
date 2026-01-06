@@ -70,7 +70,48 @@ class Inscrito(models.Model):
         choices=[('Masculino', 'Masculino'), ('Femenino', 'Femenino')],
     )
 
-    zona = models.CharField(max_length=100, blank=True, null=True)
+    # para comentar algo usamos el #
+    #y entonces vamos a usar  un choices aqui y comentar este o dejarlo asi, igual no se usara.
+    #  lo dejare ahi y are el nuevo campo, primero el choices
+    ZONAS = [
+        ('CENTRAL', 'CENTRAL'),
+        ('CDMX', 'CD. DE MEX.'),
+        ('PUEBLA', 'PUEBLA, PUE.'),
+        ('XALAPA', 'XALAPA, VER.'),
+        ('MISANTLA', 'MISANTLA, VER.'),
+        ('ALTOTONGA', 'ALTOTONGA, VER.'),
+        ('JUCHIQUE', 'JUCHIQUE DE FERRER, VER.'),
+        ('POZA_RICA', 'POZA RICA, VER.'),
+        ('CUERNAVACA', 'CUERNAVACA, MOR.'),
+        ('URUAPAN', 'URUAPAN, MICH.'),
+        ('CARDENAS', 'CARDENAS, TAB.'),
+        ('GUADALAJARA', 'GUADALAJARA, JAL.'),
+        ('SILAO', 'SILAO, GTO.'),
+        ('PACHUCA', 'PACHUCA, HGO.'),
+        ('CANCUN', 'CANCÚN, Q. R.'),
+        ('JUAREZ', 'CIUDAD JUÁREZ, CHIH.'),
+        ('MATIAS_ROMERO', 'MATÍAS ROMERO, OAX.'),
+        ('CHILPANCINGO', 'CHILPANCINGO, GRO.'),
+        ('TIJUANA', 'TIJUANA, B.C.'),
+        ('REYNOSA', 'REYNOSA, TAMPS.'),
+        ('TOLUCA', 'TOLUCA, EDO. DE MEX.'),
+        ('OAXACA', 'OAXACA, OAX.'),
+        ('ELGIN', 'ELGIN ILLINOIS, EUA'),
+        ('TAPACHULA', 'TAPACHULA, CHIS.'),
+        ('CABO', 'CABO SAN LUCAS, B.C.S.'),
+        ('TEZIUTLAN', 'TEZIUTLÁN, PUE.'),
+        ('TAMPICO', 'TAMPICO, TAMPS.'),
+        ('VERACRUZ', 'VERACRUZ, VER.'),
+        ('TOPILEJO', 'TOPILEJO, CD. MEX.'),
+        ('NEZA', 'CIUDAD NEZAHUALCÓYOTL, EDOMEX'),
+        ('MIRAFLORES', 'MIRAFLORES, EDOMEX'),
+        ('CALPULALPAN', 'CALPULALPAN, TLAX.'),
+        ('COYOTEPEC', 'COYOTEPEC, EDOMEX'),
+        ('CENTRO_SUR', 'CENTRO Y SUDAMÉRICA'),
+    ]
+    zona = models.CharField(max_length=100,choices=ZONAS, blank=True, null=True) # aqui es texto, asi que lo vamos a cmabiar a seleccionable
+
+
     subzona = models.CharField(max_length=100, blank=True, null=True)
 
     otra_denominacion = models.CharField(
@@ -81,7 +122,29 @@ class Inscrito(models.Model):
     denominacion = models.CharField(max_length=150, blank=True, null=True)
 
     telefono = models.CharField(max_length=20, unique=True)
-    grado = models.CharField(max_length=100)
+    GRADOS = [
+        ('MINISTRO', 'MINISTRO / DIACONISA'),
+        ('EG_ITE_ESC', 'EGRESADO DEL I.T.E. (Sistema Escolarizado)'),
+        ('EG_ITE_AB', 'EGRESADO DEL I.T.E. (Sistema Abierto)'),
+        ('EST_1_ESC', 'ESTUDIANTE (PRIMER AÑO) S.E.'),
+        ('EST_2_ESC', 'ESTUDIANTE (SEGUNDO AÑO) S.E.'),
+        ('EST_3_ESC', 'ESTUDIANTE (TERCER AÑO) S.E.'),
+        ('EST_1_AB', 'ESTUDIANTE (PRIMER AÑO) S. ABIERTO'),
+        ('EST_2_AB', 'ESTUDIANTE (SEGUNDO AÑO) S. ABIERTO'),
+        ('EST_3_AB', 'ESTUDIANTE (TERCER AÑO) S. ABIERTO'),
+        ('EST_4_AB', 'ESTUDIANTE (CUARTO AÑO) S. ABIERTO'),
+        ('OBRERO', 'OBRERO LAICO'),
+        ('ANCIANO', 'ANCIANO DE IGLESIA'),
+        ('OTRO', 'OTRO (ESPECIFICAR)'),
+        ('REP_ZONA', 'REPRESENTANTE DE ZONA'),
+        ('REP_SUBZONA', 'REPRESENTANTE DE SUB ZONA'),
+        ('EG_XAL_ESC', 'EGRESADO ITE CAMPUS XALAPA S. ESCOLARIZADO'),
+        ('EG_XAL_AB', 'EGRESADO ITE CAMPUS XALAPA S. ABIERTO'),
+        ('EG_SUR_ESC', 'EGRESADO ITE CAMPUS SURESTE S. ESCOLARIZADO'),
+        ('EG_ELGIN', 'EGRESADO ITE CAMPUS ELGIN, IL'),
+        ('SIN_RANGO', 'SIN RANGO'),
+    ]
+    grado = models.CharField(max_length=100, choices=GRADOS)
 
     periodo = models.CharField(max_length=50)
     monto = models.DecimalField(max_digits=8, decimal_places=2)

@@ -179,7 +179,11 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 
 class InscritoCreateView(LoginRequiredMixin, View):
-
+    def get(self, request):
+        form = InscritoForm()
+        return render(request, 'miepi/dashboard.html', {
+            'form': form
+        })
     def post(self, request):
         form = InscritoForm(request.POST)
 
