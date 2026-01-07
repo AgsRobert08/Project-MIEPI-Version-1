@@ -21,7 +21,7 @@ SECRET_KEY = os.environ.get(
     'django-insecure-dev-only'
 )
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
     'ALLOWED_HOSTS',
@@ -100,9 +100,13 @@ TEMPLATES = [
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://postgres:root@localhost:5432/EBV_MIEPI',
+        default=os.environ.get(
+            'DATABASE_URL',
+            'postgresql://postgres:root@localhost:5432/EBV_MIEPI'
+        ),
         conn_max_age=600,
-        ssl_require=not DEBUG
+        conn_health_checks=True,
+        ssl_require=False
     )
 }
 
@@ -131,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
@@ -147,6 +151,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # --------------------------------------------------
 # MEDIA FILES
@@ -175,3 +181,17 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # --------------------------------------------------
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+```
+
+---
+
+# 📝 `Procfile` (crea este archivo en la raíz, SIN extensión):
+```
+web: gunicorn project_miepi.wsgi --log-file -
+```
+
+---
+
+# 🐍 `runtime.txt` (crea este archivo en la raíz):
+```
+python-3.11.9
